@@ -6,7 +6,7 @@ import AppLayout from "./components/AppLayout";
 import AdminLayout from "./components/AdminLayout";
 import RequireAuth from "./routes/RequireAuth";
 import RequireAdmin from "./routes/RequireAdmin";
-import Home from "./pages/Home.tsx";
+import Home from "./pages/Home";
 
 // Public pages
 const Register = lazy(() => import("./pages/public/Register"));

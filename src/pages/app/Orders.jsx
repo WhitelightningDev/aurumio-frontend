@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react';
-import { useEffect, } from 'react';
+import { useState, useEffect } from 'react';
 import { offersApi, marketApi } from '../../lib/api';
 
 export default function Orders() {
