@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { authApi } from "../../lib/api";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [asAdmin, setAsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -19,13 +22,15 @@ export default function Login() {
     }
     try {
       setLoading(true);
-      await authApi.login(email, password);
-      if (remember) {
-        try { localStorage.setItem("aurumio.remember", "1"); } catch {}
+      const user = await login({ email, password, remember, isAdmin: asAdmin });
+      const from = location.state?.from?.pathname;
+      if (user.role === 'admin') {
+        navigate(from && from.startsWith('/admin') ? from : '/admin', { replace: true });
+      } else {
+        navigate(from && from.startsWith('/app') ? from : '/app', { replace: true });
       }
-      navigate("/app");
     } catch (err) {
-      setError(err?.data?.message || "Login failed. Please try again.");
+      setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -72,10 +77,14 @@ export default function Login() {
           />
         </div>
 
-        <div className="mt-3 flex items-center justify-between">
+        <div className="mt-3 flex items-center justify-between gap-2">
           <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
             <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
             Remember me
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+            <input type="checkbox" checked={asAdmin} onChange={(e) => setAsAdmin(e.target.checked)} />
+            Login as admin
           </label>
           <Link to="/verify" className="text-sm text-brand-gold-600 hover:underline">Use one-time code</Link>
         </div>

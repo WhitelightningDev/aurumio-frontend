@@ -1,11 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import "./App.css";
 import Layout from "./components/Layout";
 import AppLayout from "./components/AppLayout";
 import AdminLayout from "./components/AdminLayout";
+import RequireAuth from "./routes/RequireAuth";
+import RequireAdmin from "./routes/RequireAdmin";
 import Home from "./pages/Home.tsx";
-import { AuthProvider } from "./lib/authContext";
 
 // Public pages
 const Register = lazy(() => import("./pages/public/Register"));
@@ -81,7 +82,6 @@ function NotFound() {
 
 function App() {
   return (
-    <AuthProvider>
       <Router>
         <Suspense fallback={<div className="py-8 text-center text-neutral-600">Loading…</div>}>
           <Routes>
@@ -105,7 +105,7 @@ function App() {
           </Route>
 
           {/* App (authenticated) */}
-          <Route path="/app" element={<AppLayout />}>
+          <Route path="/app" element={<RequireAuth><AppLayout /></RequireAuth>}>
             <Route index element={<AppDashboard />} />
             <Route path="market" element={<Market />} />
             <Route path="orders" element={<Orders />} />
@@ -142,7 +142,7 @@ function App() {
           </Route>
 
           {/* Admin */}
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="fees" element={<AdminFees />} />
@@ -165,7 +165,6 @@ function App() {
           </Routes>
         </Suspense>
       </Router>
-    </AuthProvider>
   );
 }
 

@@ -1,9 +1,9 @@
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../lib/authContext";
+import { useAuth } from "../context/AuthContext";
 
 function NavBar() {
-  const { user, signOut } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const linkCls = ({ isActive }) =>
     `transition-colors ${isActive ? "text-brand-gold-600 font-medium" : "text-neutral-700 hover:text-brand-gold-600"}`;
@@ -26,22 +26,22 @@ function NavBar() {
             <NavLink to="/status" className={linkCls}>Status</NavLink>
             <NavLink to="/help" className={linkCls}>Help</NavLink>
             <NavLink to="/contact" className={linkCls}>Contact</NavLink>
+            {isAuthenticated && <NavLink to="/app" className={linkCls}>App</NavLink>}
+            {isAuthenticated && <NavLink to="/app/transactions/pending" className={linkCls}>Pending</NavLink>}
+            {isAuthenticated && isAdmin && <NavLink to="/admin" className={linkCls}>Admin</NavLink>}
           </div>
 
           {/* Desktop auth CTAs */}
           <div className="hidden md:flex items-center gap-3">
-            {!user ? (
+            {!isAuthenticated ? (
               <>
                 <Link to="/login" className="btn-base btn-secondary focus-ring">Login</Link>
                 <Link to="/register" className="btn-base btn-primary focus-ring">Register</Link>
               </>
             ) : (
               <>
-                <span className="text-sm text-neutral-600">{user.email}</span>
-                <NavLink to="/app" className={linkCls}>App</NavLink>
-                <NavLink to="/app/transactions/pending" className={linkCls}>Pending</NavLink>
-                {user.is_superuser && <NavLink to="/admin" className={linkCls}>Admin</NavLink>}
-                <button onClick={signOut} className="btn-base btn-secondary focus-ring">Logout</button>
+                <span className="text-sm text-neutral-600">{user?.email}</span>
+                <button onClick={logout} className="btn-base btn-secondary focus-ring">Logout</button>
               </>
             )}
           </div>
@@ -72,7 +72,7 @@ function NavBar() {
               <NavLink to="/status" className={linkCls} onClick={() => setMenuOpen(false)}>Status</NavLink>
               <NavLink to="/help" className={linkCls} onClick={() => setMenuOpen(false)}>Help</NavLink>
               <NavLink to="/contact" className={linkCls} onClick={() => setMenuOpen(false)}>Contact</NavLink>
-              {!user ? (
+              {!isAuthenticated ? (
                 <div className="flex items-center gap-2 pt-2">
                   <Link to="/login" className="btn-base btn-secondary focus-ring flex-1" onClick={() => setMenuOpen(false)}>Login</Link>
                   <Link to="/register" className="btn-base btn-primary focus-ring flex-1" onClick={() => setMenuOpen(false)}>Register</Link>
@@ -81,8 +81,8 @@ function NavBar() {
                 <div className="flex items-center gap-2 pt-2">
                   <NavLink to="/app" className={linkCls} onClick={() => setMenuOpen(false)}>App</NavLink>
                   <NavLink to="/app/transactions/pending" className={linkCls} onClick={() => setMenuOpen(false)}>Pending</NavLink>
-                  {user.is_superuser && <NavLink to="/admin" className={linkCls} onClick={() => setMenuOpen(false)}>Admin</NavLink>}
-                  <button onClick={() => { signOut(); setMenuOpen(false); }} className="btn-base btn-secondary focus-ring flex-1">Logout</button>
+                  {isAdmin && <NavLink to="/admin" className={linkCls} onClick={() => setMenuOpen(false)}>Admin</NavLink>}
+                  <button onClick={() => { logout(); setMenuOpen(false); }} className="btn-base btn-secondary focus-ring flex-1">Logout</button>
                 </div>
               )}
             </div>

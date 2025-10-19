@@ -7,6 +7,7 @@ export default function Register() {
   const [name, setName] = useState("");
   const [cell, setCell] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [channels, setChannels] = useState({ whatsapp: true, sms: false, email: true });
   const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,8 +18,12 @@ export default function Register() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!name || !cell || !email) {
-      setError("Please fill in Account name, Cell and Email.");
+    if (!name || !cell || !email || !password) {
+      setError("Please fill in Account name, Cell, Email, and Password.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
       return;
     }
     if (!channels.whatsapp && !channels.sms && !channels.email) {
@@ -31,7 +36,7 @@ export default function Register() {
     }
     try {
       setLoading(true);
-      await authApi.register({ account_name: name, cell_number: cell, email, password: null });
+      await authApi.register({ account_name: name, cell_number: cell, email, password });
       navigate("/login");
     } catch (err) {
       setError(err?.data?.message || "Registration failed. Please try again.");
@@ -87,6 +92,20 @@ export default function Register() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="reg-password" className="typo-label text-neutral-700">Password</label>
+            <input
+              id="reg-password"
+              type="password"
+              className="mt-1 w-full rounded-md border border-neutral-200 px-3 py-2 focus-ring"
+              placeholder="Min 8 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              autoComplete="new-password"
             />
           </div>
         </div>

@@ -1,12 +1,8 @@
-import { Outlet, Navigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
-import { useAuth } from "../lib/authContext";
 
 function AdminLayout() {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="py-8 text-center text-neutral-600">Loading…</div>;
-  if (!user?.is_superuser) return <Navigate to="/" replace />;
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50 text-neutral-900">
       <NavBar />
