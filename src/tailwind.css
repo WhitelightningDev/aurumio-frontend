@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+/* Tell Tailwind where to look for class names */
+@source "./**/*.{js,jsx,ts,tsx,html}";
+
+/*
+  Design tokens for Aurumio (Gold + Silver marketplace)
+  Tailwind v4: customize theme using @theme tokens.
+*/
+@layer theme {
+  @theme {
+    /* Typography */
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+    /* Brand — Gold */
+    --color-brand-gold-600: #B68B2D; /* primary */
+    --color-brand-gold-500: #C9A23A;
+    --color-brand-gold-400: #D7B656;
+    --color-brand-gold-200: #EAD99A;
+
+    /* Neutral / “silver” */
+    --color-neutral-950: #0B0C0E;
+    --color-neutral-900: #111317;
+    --color-neutral-800: #1A1D22;
+    --color-neutral-700: #2A2F37;
+    --color-neutral-600: #3B424D;
+    --color-neutral-500: #525C6A; /* table borders, icons */
+    --color-neutral-400: #6E7A8C;
+    --color-neutral-300: #8D99A8;
+    --color-neutral-200: #C3CBD6; /* dividers */
+    --color-neutral-100: #E6EBF2; /* muted backgrounds */
+    --color-neutral-50:  #F5F7FA; /* page BG */
+    /* Optional alias for 050 spelling */
+    --color-neutral-050: #F5F7FA;
+
+    /* Feedback */
+    --color-success-600: #1C7C54; /* payments cleared, matched */
+    --color-warning-600: #A55A00; /* pending action */
+    --color-error-600:   #B42318; /* failed payment, invalid */
+    --color-info-600:    #1E6091; /* notices & focus */
+
+    /* Accents (sparingly) */
+    --color-accent-silver: #A7B0BF;
+    --color-accent-green:  #1FA97A;
+
+    /* Interactive tokens */
+    --color-primary-fg: #0B0C0E; /* text on primary */
+    --color-primary:    var(--color-brand-gold-600);
+    --color-primary-hover:  var(--color-brand-gold-500);
+    --color-primary-pressed: var(--color-brand-gold-400);
+
+    --color-secondary-fg: #0B0C0E;
+    --color-secondary:       var(--color-neutral-100);
+    --color-secondary-hover: var(--color-neutral-200);
+    --color-secondary-pressed: var(--color-neutral-300);
+
+    --color-destructive-fg: #FFFFFF;
+    --color-destructive: #B42318; /* error-600 */
+    --color-destructive-hover: #9F241A;
+    --color-destructive-pressed: #8C1F16;
+
+    /* Focus ring */
+    --color-focus: #1E6091; /* info-600 */
+
+    /* Radii (px) */
+    --radius-sm: 8px;   /* badges */
+    --radius:    12px;  /* default (rounded) */
+    --radius-md: 12px;  /* cards, inputs, buttons */
+    --radius-xl: 16px;  /* modals */
+
+    /* Shadows */
+    --shadow-card: 0 2px 8px rgba(0,0,0,.06);
+    --shadow-popover: 0 8px 24px rgba(0,0,0,.12);
+    --shadow-header: 0 1px 0 rgba(0,0,0,.08);
+  }
+}
+
+/*
+  Component-like helpers as plain CSS classes (keeps Tailwind happy and simple).
+*/
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: background-color var(--default-transition-duration) var(--default-transition-timing-function),
+              color var(--default-transition-duration) var(--default-transition-timing-function),
+              box-shadow var(--default-transition-duration) var(--default-transition-timing-function);
+}
+.btn-primary { color: var(--color-primary-fg); background: var(--color-primary); }
+.btn-primary:hover { background: var(--color-primary-hover); }
+.btn-primary:active { background: var(--color-primary-pressed); }
+
+.btn-secondary { color: var(--color-secondary-fg); background: var(--color-secondary); }
+.btn-secondary:hover { background: var(--color-secondary-hover); }
+.btn-secondary:active { background: var(--color-secondary-pressed); }
+
+.btn-destructive { color: var(--color-destructive-fg); background: var(--color-destructive); }
+.btn-destructive:hover { background: var(--color-destructive-hover); }
+.btn-destructive:active { background: var(--color-destructive-pressed); }
+
+/* Focus ring helper (outside ring, 2px) */
+.focus-ring:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* Status chips */
+.chip { @apply inline-flex items-center rounded-sm px-2.5 py-1 text-xs font-medium; }
+.chip-active { @apply inline-flex items-center rounded-sm px-2.5 py-1 text-xs font-medium; color: #1E6091; background: #E6F0FA; }
+.chip-partially-matched { @apply inline-flex items-center rounded-sm px-2.5 py-1 text-xs font-medium; color: #A55A00; background: #FFF3E0; }
+.chip-pending-payment { @apply inline-flex items-center rounded-sm px-2.5 py-1 text-xs font-medium; color: #6A5200; background: #FFF7CC; }
+.chip-shipped { @apply inline-flex items-center rounded-sm px-2.5 py-1 text-xs font-medium; color: #1E6091; background: #E6F0FA; }
+.chip-delivered { @apply inline-flex items-center rounded-sm px-2.5 py-1 text-xs font-medium; color: #1C7C54; background: #E5F4EE; }
+.chip-complete { @apply inline-flex items-center rounded-sm px-2.5 py-1 text-xs font-medium; color: #0F5132; background: #D1F0E2; }
+.chip-cancelled { @apply inline-flex items-center rounded-sm px-2.5 py-1 text-xs font-medium; color: #842029; background: #F8D7DA; }
+
+/* Typography helpers */
+.typo-display { font-size: 32px; line-height: 40px; font-weight: 600; }
+.typo-h1 { font-size: 24px; line-height: 32px; font-weight: 600; }
+.typo-h2 { font-size: 20px; line-height: 28px; font-weight: 600; }
+.typo-h3 { font-size: 18px; line-height: 26px; font-weight: 500; }
+.typo-body { font-size: 14px; line-height: 22px; }
+.typo-label { font-size: 12px; line-height: 18px; font-weight: 500; }
+.tnum { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* Helpful aliases */
+.card { border-radius: var(--radius-md); box-shadow: var(--shadow-card); background: white; }
+.popover { border-radius: var(--radius-md); box-shadow: var(--shadow-popover); background: white; }
+.elevated-header { box-shadow: var(--shadow-header); }
