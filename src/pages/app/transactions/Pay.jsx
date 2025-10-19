@@ -1,16 +1,30 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ADMIN_BANK } from "../../../lib/adminSettings";
+import { txApi, uploadFile } from "../../../lib/api";
 
 export default function Pay() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [fileName, setFileName] = useState("");
+  const [fileObj, setFileObj] = useState(null);
+  const [amount, setAmount] = useState("");
+  const [error, setError] = useState("");
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    // TODO: upload proof
-    navigate("/app/transactions/pending");
+    setError("");
+    try {
+      let proof_file_id = undefined;
+      if (fileObj) {
+        const up = await uploadFile(fileObj);
+        proof_file_id = up.file_id;
+      }
+      await txApi.pay(id, { amount: Number(amount || 0), reference: `MATCH-${id}`, proof_file_id });
+      navigate("/app/transactions/pending");
+    } catch (e) {
+      setError(e?.data?.message || 'Failed to mark paid');
+    }
   };
 
   return (
@@ -30,12 +44,13 @@ export default function Pay() {
             <p className="mt-2 text-xs text-neutral-600">Use the exact reference above so we can match your payment.</p>
           </div>
           <div>
-            <h2 className="font-semibold">Amount Due</h2>
-            <div className="mt-2 text-2xl font-semibold tnum">R 0</div>
-            <p className="text-sm text-neutral-600">Amount placeholder for match <span className="tnum">{id}</span>.</p>
+            <h2 className="font-semibold">Amount Paid</h2>
+            {error && <div className="mb-3 rounded-md bg-error-600/10 px-3 py-2 text-sm text-error-600">{error}</div>}
+            <input value={amount} onChange={(e)=>setAmount(e.target.value)} className="mt-2 w-full rounded-md border border-neutral-200 px-3 py-2 focus-ring" placeholder="e.g. 100000" />
+            <p className="text-sm text-neutral-600 mt-1">For match <span className="tnum">{id}</span>.</p>
             <form onSubmit={onSubmit} className="mt-4">
               <label className="typo-label text-neutral-700">Upload payment proof</label>
-              <input type="file" onChange={(e)=>setFileName(e.target.files?.[0]?.name||"")} className="mt-1 block w-full text-sm" />
+              <input type="file" onChange={(e)=>{ setFileObj(e.target.files?.[0]||null); setFileName(e.target.files?.[0]?.name||""); }} className="mt-1 block w-full text-sm" />
               {fileName && <div className="mt-1 text-xs text-neutral-600">Selected: {fileName}</div>}
               <button className="mt-3 btn-base btn-primary focus-ring">Mark as Paid</button>
             </form>

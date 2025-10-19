@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { authApi } from "../../lib/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -30,11 +31,10 @@ export default function Register() {
     }
     try {
       setLoading(true);
-      // TODO: Replace with real registration API
-      await new Promise((r) => setTimeout(r, 800));
-      navigate("/verify");
+      await authApi.register({ account_name: name, cell_number: cell, email, password: null });
+      navigate("/login");
     } catch (err) {
-      setError("Registration failed. Please try again.");
+      setError(err?.data?.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }

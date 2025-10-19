@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { authApi } from "../../lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,14 +19,13 @@ export default function Login() {
     }
     try {
       setLoading(true);
-      // TODO: Replace with real auth API
-      await new Promise((r) => setTimeout(r, 600));
+      await authApi.login(email, password);
       if (remember) {
         try { localStorage.setItem("aurumio.remember", "1"); } catch {}
       }
       navigate("/app");
     } catch (err) {
-      setError("Login failed. Please try again.");
+      setError(err?.data?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }

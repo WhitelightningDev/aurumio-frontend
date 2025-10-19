@@ -1,10 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import "./App.css";
 import Layout from "./components/Layout";
 import AppLayout from "./components/AppLayout";
 import AdminLayout from "./components/AdminLayout";
 import Home from "./pages/Home.tsx";
+import { AuthProvider } from "./lib/authContext";
 
 // Public pages
 const Register = lazy(() => import("./pages/public/Register"));
@@ -51,6 +52,7 @@ const SellIndex = lazy(() => import("./pages/app/sell/SellIndex"));
 // App > Transactions
 const Pay = lazy(() => import("./pages/app/transactions/Pay"));
 const Ship = lazy(() => import("./pages/app/transactions/Ship"));
+const Delivered = lazy(() => import("./pages/app/transactions/Delivered"));
 
 // Admin
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -79,9 +81,10 @@ function NotFound() {
 
 function App() {
   return (
-    <Router>
-      <Suspense fallback={<div className="py-8 text-center text-neutral-600">Loading…</div>}>
-        <Routes>
+    <AuthProvider>
+      <Router>
+        <Suspense fallback={<div className="py-8 text-center text-neutral-600">Loading…</div>}>
+          <Routes>
           {/* Public */}
           <Route element={<Layout />}>
             <Route index element={<Home />} />
@@ -122,6 +125,7 @@ function App() {
             {/* Transactions */}
             <Route path="transactions/:id/pay" element={<Pay />} />
             <Route path="transactions/:id/ship" element={<Ship />} />
+            <Route path="transactions/:id/delivered" element={<Delivered />} />
 
             {/* Settings */}
             <Route path="settings/profile" element={<SettingsProfile />} />
@@ -158,9 +162,10 @@ function App() {
           {/* Error routes */}
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </Router>
+          </Routes>
+        </Suspense>
+      </Router>
+    </AuthProvider>
   );
 }
 

@@ -1,11 +1,20 @@
-import { useMemo, useState } from 'react';
-import { PRODUCTS } from '../../../lib/products';
+import { useEffect, useMemo, useState } from 'react';
 import { calcFeePerUnit, calcNetPerUnit } from '../../../lib/fees';
+import { marketApi, offersApi } from '../../../lib/api';
 
 export default function BuyNew() {
-  const [productId, setProductId] = useState(PRODUCTS[0].id);
+  const [products, setProducts] = useState([]);
+  const [productId, setProductId] = useState('');
   const [qty, setQty] = useState(1);
   const [gross, setGross] = useState('100');
+
+  useEffect(() => {
+    (async () => {
+      const prods = await marketApi.products();
+      setProducts(prods);
+      if (prods?.[0]?.id) setProductId(prods[0].id);
+    })();
+  }, []);
 
   const grossNum = Number(gross || 0);
   const feePerUnit = useMemo(() => calcFeePerUnit('buyer', productId, grossNum), [productId, grossNum]);
@@ -22,7 +31,7 @@ export default function BuyNew() {
           <div>
             <label className="typo-label text-neutral-700" htmlFor="product">Product</label>
             <select id="product" className="mt-1 w-full rounded-md border border-neutral-200 px-3 py-2 focus-ring" value={productId} onChange={(e)=>setProductId(e.target.value)}>
-              {PRODUCTS.map(p => (<option key={p.id} value={p.id}>{p.name}</option>))}
+              {products.map(p => (<option key={p.id} value={p.id}>{p.name}</option>))}
             </select>
           </div>
           <div>
@@ -51,7 +60,12 @@ export default function BuyNew() {
         </div>
 
         <div className="mt-4">
-          <button className="btn-base btn-primary focus-ring">Post Buy Offer</button>
+          <button className="btn-base btn-primary focus-ring" onClick={async()=>{
+            try {
+              await offersApi.create({ side: 'BUY', product_id: productId, qty_total: qty, price_per_unit_gross: gross });
+              alert('Buy offer posted. Matching in progress.');
+            } catch (e) { alert(e?.data?.message || 'Failed to post offer'); }
+          }}>Post Buy Offer</button>
         </div>
       </div>
       <p className="text-sm text-neutral-600">Your net is used when matching against seller prices. RSA-only transactions.</p>

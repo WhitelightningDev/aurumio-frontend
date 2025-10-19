@@ -1,13 +1,28 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PRODUCTS } from '../../lib/products';
+import { marketApi } from '../../lib/api';
 
 export default function Market() {
   const [query, setQuery] = useState('');
+  const [products, setProducts] = useState([]);
+  const [active, setActive] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [prods, act] = await Promise.all([marketApi.products(), marketApi.activeOrders()]);
+        setProducts(prods);
+        setActive(act);
+      } catch (e) {
+        console.error('Failed to load market data', e);
+      }
+    })();
+  }, []);
+
   const items = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return PRODUCTS.filter(p => !q || p.name.toLowerCase().includes(q) || p.metal.includes(q));
-  }, [query]);
+    return (products || []).filter(p => !q || p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q));
+  }, [query, products]);
 
   return (
     <section className="space-y-4">
@@ -30,12 +45,11 @@ export default function Market() {
           <div key={p.id} className="card border border-neutral-200 p-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-xl" aria-hidden>{p.icon}</span>
                 <h3 className="font-semibold">{p.name}</h3>
               </div>
               <span className="inline-flex items-center rounded-sm px-2 py-0.5 text-[11px] font-medium bg-neutral-100 text-neutral-700">RSA Only</span>
             </div>
-            <div className="mt-3 text-2xl font-semibold tnum">R{p.defaultPriceZAR.toLocaleString('en-ZA')}</div>
+            <div className="mt-3 text-2xl font-semibold tnum">{p.unit}</div>
             <div className="mt-4 flex items-center gap-2">
               <Link to="/app/buy/new" className="btn-base btn-primary focus-ring">Buy</Link>
               <Link to="/app/sell/new" className="btn-base btn-secondary focus-ring">Sell</Link>
@@ -59,11 +73,11 @@ export default function Market() {
               </tr>
             </thead>
             <tbody>
-              {[{qty:5,price:44500},{qty:10,price:520},{qty:2,price:16300},{qty:3,price:44750},{qty:25,price:515}].map((o, idx) => (
+              {active.map((o, idx) => (
                 <tr key={idx} className="border-t border-neutral-100">
-                  <td className="px-3 py-2 text-right tnum">{o.qty}</td>
-                  <td className="px-3 py-2 text-right tnum">{o.price.toLocaleString('en-ZA')}</td>
-                  <td className="px-3 py-2 text-right tnum">{(o.qty*o.price).toLocaleString('en-ZA')}</td>
+                  <td className="px-3 py-2 text-right tnum">{o.qty_remaining}</td>
+                  <td className="px-3 py-2 text-right tnum">{Number(o.price_per_unit_gross).toLocaleString('en-ZA')}</td>
+                  <td className="px-3 py-2 text-right tnum">{Number(o.total_value).toLocaleString('en-ZA')}</td>
                 </tr>
               ))}
             </tbody>

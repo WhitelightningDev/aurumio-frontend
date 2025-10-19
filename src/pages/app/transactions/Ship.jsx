@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { txApi } from "../../../lib/api";
 
 export default function Ship() {
   const { id } = useParams();
@@ -8,16 +9,21 @@ export default function Ship() {
   const [tracking, setTracking] = useState('');
   const [waybill, setWaybill] = useState('');
 
-  const onSubmit = (e) => {
+  const [error, setError] = useState('');
+  const onSubmit = async (e) => {
     e.preventDefault();
-    // TODO: upload waybill and confirm shipped
-    navigate('/app/transactions/pending');
+    setError('');
+    try {
+      await txApi.ship(id, { method: courier, tracking_number: tracking, waybill_file_id: null });
+      navigate('/app/transactions/pending');
+    } catch (e) { setError(e?.data?.message || 'Failed to mark shipped'); }
   };
 
   return (
     <section className="space-y-4">
       <h1 className="text-2xl font-semibold">Shipment & Waybill</h1>
       <div className="card border border-neutral-200 p-4">
+        {error && <div className="mb-3 rounded-md bg-error-600/10 px-3 py-2 text-sm text-error-600">{error}</div>}
         <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="typo-label text-neutral-700" htmlFor="courier">Courier</label>
