@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { calcFeePerUnit, calcNetPerUnit } from '../../../lib/fees';
 import { marketApi, offersApi } from '../../../lib/api';
+import { useToast } from '../../../components/ToastProvider';
 
 export default function SellNew() {
+  const toast = useToast();
   const [products, setProducts] = useState([]);
   const [productId, setProductId] = useState('');
   const [qty, setQty] = useState(1);
@@ -63,8 +65,13 @@ export default function SellNew() {
           <button className="btn-base btn-primary focus-ring" onClick={async()=>{
             try {
               await offersApi.create({ side: 'SELL', product_id: productId, qty_total: qty, price_per_unit_gross: gross });
-              alert('Sell offer posted. Matching in progress.');
-            } catch (e) { alert(e?.data?.message || 'Failed to post offer'); }
+              // Only show one toast
+              toast.show('Sell offer posted. Matching in progress.', { type: 'success' });
+              // Clear form or redirect if needed
+            } catch (e) {
+              const errorMsg = e?.data?.message || 'Failed to post offer';
+              toast.show(errorMsg, { type: 'error' });
+            }
           }}>Post Sell Offer</button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useToast } from "../../components/ToastProvider";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -6,18 +7,17 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const toast = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [asAdmin, setAsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     if (!email || !password) {
-      setError("Please enter your email and password.");
+      toast.show("Please enter your email and password.", { type: "error" });
       return;
     }
     try {
@@ -29,8 +29,10 @@ export default function Login() {
       } else {
         navigate(from && from.startsWith('/app') ? from : '/app', { replace: true });
       }
+      // Only show success toast after navigation is complete
+      toast.show("Login successful!", { type: "success" });
     } catch (err) {
-      setError("Login failed. Please try again.");
+      toast.show("Login failed. Please try again.", { type: "error" });
     } finally {
       setLoading(false);
     }
@@ -42,11 +44,6 @@ export default function Login() {
       <p className="text-neutral-600 mt-1">Welcome back. Enter your details to continue.</p>
 
       <form onSubmit={onSubmit} className="card border border-neutral-200 p-5 mt-4">
-        {error && (
-          <div className="mb-3 rounded-md bg-error-600/10 px-3 py-2 text-sm text-error-600">
-            {error}
-          </div>
-        )}
         <div>
           <label htmlFor="email" className="typo-label text-neutral-700">Email</label>
           <input

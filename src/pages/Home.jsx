@@ -70,7 +70,7 @@ const Home = () => {
 
         <div className="max-w-3xl">
           <h1 className="typo-display text-neutral-900">
-            Buy and Sell Krugerrands & Silver in South Africa — Secure, Instant, and Verified.
+            Where Buyers and Sellers Connect — Buy & Sell Precious Metals in South Africa. Secure, Instant, Verified.
           </h1>
           <p className="mt-3 text-neutral-700">
             Trade 1 oz Krugerrands, Silver bars and coins. RSA-only, courier or locker collection.

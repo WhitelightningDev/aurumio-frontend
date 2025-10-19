@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useToast } from "../../components/ToastProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { authApi } from "../../lib/api";
 
 export default function Register() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [name, setName] = useState("");
   const [cell, setCell] = useState("");
   const [email, setEmail] = useState("");
@@ -11,35 +13,36 @@ export default function Register() {
   const [channels, setChannels] = useState({ whatsapp: true, sms: false, email: true });
   const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const toggle = (key) => setChannels((c) => ({ ...c, [key]: !c[key] }));
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    
     if (!name || !cell || !email || !password) {
-      setError("Please fill in Account name, Cell, Email, and Password.");
+      toast.show("Please fill in Account name, Cell, Email, and Password.", { type: "error" });
       return;
     }
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long.");
+      toast.show("Password must be at least 8 characters long.", { type: "error" });
       return;
     }
     if (!channels.whatsapp && !channels.sms && !channels.email) {
-      setError("Choose at least one notification channel.");
+      toast.show("Choose at least one notification channel.", { type: "error" });
       return;
     }
     if (!agree) {
-      setError("Please accept the Terms and Privacy Policy.");
+      toast.show("Please accept the Terms and Privacy Policy.", { type: "error" });
       return;
     }
     try {
       setLoading(true);
       await authApi.register({ account_name: name, cell_number: cell, email, password });
+      // Navigate first, then show success toast
       navigate("/login");
+      toast.show("Registration successful! Please log in.", { type: "success" });
     } catch (err) {
-      setError(err?.data?.message || "Registration failed. Please try again.");
+      toast.show(err?.data?.message || "Registration failed. Please try again.", { type: "error" });
     } finally {
       setLoading(false);
     }
@@ -51,11 +54,6 @@ export default function Register() {
       <p className="text-neutral-600 mt-1">Register in under 30 seconds. RSA-only.</p>
 
       <form onSubmit={onSubmit} className="card border border-neutral-200 p-5 mt-4">
-        {error && (
-          <div className="mb-3 rounded-md bg-error-600/10 px-3 py-2 text-sm text-error-600">
-            {error}
-          </div>
-        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="md:col-span-2">
