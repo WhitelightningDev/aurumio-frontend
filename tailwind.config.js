@@ -40,17 +40,9 @@ module.exports = {
         warning: { 600: '#A55A00' },
         error:   { 600: '#B42318' },
         info:    { 600: '#1E6091' },
-        accent: {
-          silver: '#A7B0BF',
-          green:  '#1FA97A',
-        },
+        accent: { silver: '#A7B0BF', green: '#1FA97A' },
       },
-      borderRadius: {
-        DEFAULT: '12px',
-        sm: '8px',
-        md: '12px',
-        xl: '16px',
-      },
+      borderRadius: { DEFAULT: '12px', sm: '8px', md: '12px', xl: '16px' },
       boxShadow: {
         card: '0 2px 8px rgba(0,0,0,.06)',
         popover: '0 8px 24px rgba(0,0,0,.12)',
